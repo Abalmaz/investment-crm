@@ -54,6 +54,7 @@ class MenuCredit(BaseMenu):
             print(f"ID: {credit.id}, "
                   f"start date: {credit.start_date}, "
                   f"end date: {credit.end_date}")
+        print("-" * 30)
         credit_id = int(input("Enter Credit ID: "))
         percent = int(input("Percent: "))
         max_sum = int(input("Limit: "))
@@ -146,7 +147,7 @@ class MainMenu(BaseMenu):
             "1": self.credit_menu,
             "2": self.investor_menu,
             "3": self.create_investment,
-            "4": self.calculate_profit,
+            "4": self.calculated_profit,
             "9": self.quit
         }
 
@@ -169,23 +170,27 @@ class MainMenu(BaseMenu):
         )
 
     def create_investment(self):
+        print("-" * 30)
         print("Existing tranches:")
         for credit in self.credit_menu.credits:
             for tr in credit.tranches:
                 print(f"ID: {tr.id}, "
                       f"percent: {tr.percent}, "
                       f"threshold limit: {tr.threshold_limit}")
+        print("-" * 30)
         tranche = None
         tranche_id = int(input("Tranche id: "))
         for credit in self.credit_menu.credits:
             for tr in credit.tranches:
                 if tr.id == tranche_id:
                     tranche = tr
+        print("-" * 30)
         print("Existing investors:")
         for investor in self.investor_menu.investors:
             print(f"ID: {investor.id}, "
                   f"name: {investor.name}, "
                   f"account: {investor.account}")
+        print("-" * 30)
         investor_id = int(input("Investor id: "))
         investor = self.investor_menu.investors[investor_id]
         amount = int(input("Amount of investment: "))
@@ -214,7 +219,6 @@ class MainMenu(BaseMenu):
 
         for investment in self.investments:
             count_days = calculate_date - investment.date_invest
-            print(f"Count days: {count_days}")
             profit = calculate_profit(investment.sum,
                                       investment.tranche.percent,
                                       days_in_month,
