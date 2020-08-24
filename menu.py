@@ -45,15 +45,22 @@ class MenuCredit(BaseMenu):
         end_date = input("Enter end date:   ")
         print("-" * 30)
         self.credits.append(Credit(start_date, end_date))
+        print("Credit was successfully created.")
 
     def add_tranche_for_credit(self):
         print("-" * 30)
+        print("Existing credits:")
+        for credit in self.credits:
+            print(f"ID: {credit.id}, "
+                  f"start date: {credit.start_date}, "
+                  f"end date: {credit.end_date}")
         credit_id = int(input("Enter Credit ID: "))
         percent = int(input("Percent: "))
         max_sum = int(input("Limit: "))
         print("-" * 30)
         credit = self.credits[credit_id]
         credit.create_tranche(percent, max_sum)
+        print("Tranche was successfully created")
 
     def show_all_credits(self):
         print("-" * 30)
@@ -113,6 +120,7 @@ class MenuInvestor(BaseMenu):
         name = input("Enter name:  ")
         print("-" * 30)
         self.investors.append(Investor(name))
+        print(f"Investor {name} was successfully created")
 
     def show_all_investors(self):
         print("-" * 30)
@@ -161,13 +169,23 @@ class MainMenu(BaseMenu):
         )
 
     def create_investment(self):
+        print("Existing tranches:")
+        for credit in self.credit_menu.credits:
+            for tr in credit.tranches:
+                print(f"ID: {tr.id}, "
+                      f"percent: {tr.percent}, "
+                      f"threshold limit: {tr.threshold_limit}")
         tranche = None
         tranche_id = int(input("Tranche id: "))
         for credit in self.credit_menu.credits:
             for tr in credit.tranches:
                 if tr.id == tranche_id:
                     tranche = tr
-        print(f"Tranche id: {tranche.id}, percent: {tranche.percent}")
+        print("Existing investors:")
+        for investor in self.investor_menu.investors:
+            print(f"ID: {investor.id}, "
+                  f"name: {investor.name}, "
+                  f"account: {investor.account}")
         investor_id = int(input("Investor id: "))
         investor = self.investor_menu.investors[investor_id]
         amount = int(input("Amount of investment: "))
@@ -180,6 +198,7 @@ class MainMenu(BaseMenu):
                                         amount, date_invest)
                     investor.account -= amount
                     tranche.current_amount += amount
+                    print("Tranche was successfully created")
                 else:
                     print("Investor didn't have enough money")
             else:
@@ -187,7 +206,7 @@ class MainMenu(BaseMenu):
         else:
             print("Credit is close")
 
-    def calculate_profit(self):
+    def calculated_profit(self):
         settlement_date = input("Settlement date: ")
         calculate_date = datetime.strptime(settlement_date, '%Y-%m-%d').date()
         days_in_month = number_of_days_in_month(calculate_date.year,
@@ -195,11 +214,12 @@ class MainMenu(BaseMenu):
 
         for investment in self.investments:
             count_days = calculate_date - investment.date_invest
+            print(f"Count days: {count_days}")
             profit = calculate_profit(investment.sum,
                                       investment.tranche.percent,
                                       days_in_month,
                                       count_days.days)
-            print(f"Investor: {investment.investor.name}, Profit: {profit}")
+            print(f"Investor: {investment.investor.name}, Profit: {profit:.2f}")
 
     def quit(self):
         print("Thank you for using Bank_CRM")
