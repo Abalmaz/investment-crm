@@ -1,122 +1,59 @@
 import itertools
 from datetime import date, datetime
+from dataclasses import dataclass
 
 
-class Credit:
-    @property
-    def end_date(self):
-        return self._end_date
-
-    id_iter = itertools.count()
-
-    def __init__(self, start_date, end_date):
-        self.id = next(Credit.id_iter)
-        self._start_date = start_date
-        self._end_date = end_date
-        self.tranches = []
-
-    def __str__(self):
-        return f'Credit ID: {self.id} '
-
-    start_date = property()
-
-    @start_date.setter
-    def start_date(self, str_date):
-        self._start_date = datetime.strptime(
-            str_date, '%Y-%m-%d'
-        ).date()
-
-    @start_date.getter
-    def start_date(self):
-        return self._start_date
-
-    end_date = property()
-
-    @end_date.setter
-    def end_date(self, str_date):
-        self._end_date = datetime.strptime(
-            str_date, '%Y-%m-%d'
-        ).date()
-
-    @end_date.getter
-    def end_date(self):
-        return self._end_date
-
-    def is_open_credit(self):
-        return date.today() < datetime.strptime(self._end_date, '%Y-%m-%d').date()
-
-    def create_tranche(self, percent, max_sum):
-        self.tranches.append(Tranche(self,
-                                     percent=percent,
-                                     max_sum=max_sum)
-                             )
-
-    def get_tranche(self, tranche_id):
-        return self.tranches[tranche_id]
-
-
+@dataclass
 class Tranche:
-    id_iter = itertools.count()
+    id: int
+    percent: int
+    max_sum: int
+    current_amount: int = 0,
+    _threshold_limit: int = 0
 
-    def __init__(self, credit, percent, max_sum):
-        self.id = next(Tranche.id_iter)
-        self.credit = credit
-        self.percent = percent
-        self.max_sum = max_sum
-        self.current_amount = 0
-        self._threshold_limit = 0
-
-    def __str__(self):
-        return f"{self.credit}, " \
-               f"{self.id}, " \
-               f"{self.percent}, " \
-               f"{self.current_amount}, " \
-               f"{self.threshold_limit}"
+    def __post_init__(self):
+        self.id += 1
 
     @property
-    def threshold_limit(self):
+    def threshold_limit(self) -> int:
         return self.max_sum - self.current_amount
 
-    def can_investment(self, amount):
+    def can_investment(self, amount) -> bool:
         return bool(amount <= self.threshold_limit)
 
 
+@dataclass
+class Credit:
+    tranches: Tranche
+    end_date: str
+    id: int = 0
+    start_date: str = str(datetime.utcnow().isoformat())
+
+    def __post_init__(self):
+        self.id += 1
+
+    def is_open_credit(self) -> bool:
+        return date.today() < datetime.strptime(
+            self.end_date, '%Y-%m-%d').date()
+
+
+@dataclass
 class Investor:
+    id: int
+    name: str
+    account: int = 1000
     id_iter = itertools.count()
 
-    def __init__(self, name, account=1000):
-        self.id = next(Investor.id_iter)
-        self.name = name
-        self.account = account
+    def __post_init__(self):
+        self.id += 1
 
-    def __str__(self):
-        return f"Investor:{self.id}  {self.name}"
-
-    def balance_check(self, amount):
+    def balance_check(self, amount) -> bool:
         return amount <= self.account
 
 
+@dataclass
 class Investment:
-    def __init__(self,
-                 tranche,
-                 investor,
-                 sum_invest,
-                 date_invest_str):
-        self.tranche = tranche
-        self.investor = investor
-        self.sum = sum_invest
-        self._date_invest = date_invest_str
-
-    date_invest = property()
-
-    @date_invest.setter
-    def date_invest(self, str_date):
-        datetime.strptime(
-            str_date, '%Y-%m-%d'
-        ).date()
-
-    @date_invest.getter
-    def date_invest(self):
-        return datetime.strptime(
-            self._date_invest, '%Y-%m-%d'
-        ).date()
+    tranche: Tranche
+    investor: Investor
+    sum: int
+    date_invest: str = str(datetime.utcnow().isoformat())
