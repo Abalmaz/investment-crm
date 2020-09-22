@@ -3,11 +3,16 @@ from datetime import date, datetime
 from dataclasses import dataclass, field
 from typing import List
 
+count_tranche = itertools.count()
+count_credit = itertools.count()
+count_investor = itertools.count()
+
 
 @dataclass
 class Tranche:
     percent: int
     max_sum: int
+    id: int = field(default_factory=lambda: next(count_tranche))
     current_amount: int = 0,
     _threshold_limit: int = 0
 
@@ -22,6 +27,7 @@ class Tranche:
 @dataclass
 class Credit:
     end_date: str
+    id: int = field(default_factory=lambda: next(count_credit))
     start_date: str = str(datetime.utcnow().isoformat())
     tranches: List[Tranche] = field(default_factory=list)
 
@@ -33,6 +39,7 @@ class Credit:
 @dataclass
 class Investor:
     name: str
+    id: int = field(default_factory=lambda: next(count_investor))
     account: int = 1000
     id_iter = itertools.count()
 
