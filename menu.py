@@ -1,8 +1,33 @@
+import gc
 import sys
 from datetime import datetime
 
 from models import Credit, Investor, Investment
 from utils import calculate_profit, number_of_days_in_month
+
+
+class HandlingModelCRM:
+    @staticmethod
+    def create_object(class_name, **kwargs):
+        obj = class_name(**kwargs)
+        return obj
+
+    @staticmethod
+    def list_objects(class_name):
+        for obj in gc.get_objects():
+            if isinstance(obj, class_name):
+                print(obj)
+
+    @staticmethod
+    def detail_object(obj):
+        for key, val in obj.__dict__.items():
+            print(f"{key}: {val}")
+
+    @staticmethod
+    def list_relation_object(obj, relation_name):
+        if hasattr(obj, relation_name):
+            for item in obj.__getattribute__(relation_name):
+                print(item)
 
 
 class BaseMenu:
